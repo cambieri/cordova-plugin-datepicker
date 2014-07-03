@@ -39,7 +39,16 @@ DatePicker.prototype.show = function(options, cb) {
 	//this._callback = cb;
 
 	var callback = function(message) {
-		cb(new Date(message));
+		var callback = function(message) {
+			// Workaround for Android 2
+			if (device.platform.toLowerCase() == "android" && device.version.substr(0,2) === "2.") {
+				var d = new Date(message.replace("T", " ").replace("+0000", ""));
+				d.setTime(d.getTime() - d.getTimezoneOffset()*60000);
+				cb(d);
+			} else {
+				cb(new Date(message));
+			}
+		}
 	}
   
 	cordova.exec(callback, 
